@@ -18,8 +18,49 @@ class QuestionFollower
         question_followers
       WHERE
         question_followers.id = :id
+      LIMIT
+        1
       SQL
-      QuestionFollower.new(result)
+      QuestionFollower.new(result.first)
+  end
+
+  def self.followers_for_question_id(question_id)
+    results = QuestionsDatabase.instance.execute(<<-SQL, :id => question_id)
+      SELECT
+        *
+      FROM
+        users
+      JOIN
+        (SELECT
+          user_id
+        FROM
+          question_followers
+        WHERE
+          question_followers.question_id = :id) AS followers
+      ON users.id = followers.user_id
+      SQL
+
+    results.map { |result| User.new(result) }
+  end
+
+  def self.followed_questions_for_user_id(user_id)
+    results = QuestionsDatabase.instance.execute(<<-SQL, :id => user_id)
+      SELECT
+        *
+      FROM
+        questions
+      JOIN
+        (SELECT
+          question_id
+         FROM
+          question_followers
+         WHERE
+          question_followers.user_id = :id
+         ) AS questions_followed
+       ON questions.id = questions_followed.question_id
+    SQL
+
+    results.map { |result| Question.new(result) }
   end
 
   attr_accessor :id, :user_id, :question_id

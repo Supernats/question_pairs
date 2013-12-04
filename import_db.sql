@@ -52,13 +52,14 @@ INSERT INTO
   questions (title, body, user_id)
 VALUES
   ('Who likes SQL?','Certainly not me!', '1'),
-  ('What is with this indenting?', 'It sucks!', '2');
+  ('What is with this indenting?', 'It sucks!', '2'),
+  ('Do you like cheese?', 'Yeaaaaa', '1');
 
 INSERT INTO
   question_followers (question_id, user_id)
 VALUES
   (1, 2),
-  (2,1);
+  (2, 1);
 
 INSERT INTO
   replies (question_id, parent_id, user_id, body)

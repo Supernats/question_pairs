@@ -1,5 +1,4 @@
 class User
-
   def self.all
     results = QuestionsDatabase.instance.execute(<<-SQL)
       SELECT
@@ -20,29 +19,17 @@ class User
       WHERE
         users.id = :id
       SQL
-      User.new(result)
+      User.new(result.first)
   end
 
-  def self.find_by_fname(fname)
-    result = QuestionsDatabase.instance.execute(<<-SQL, :fname => fname)
+  def self.find_by(fname, lname)
+    result = QuestionsDatabase.instance.execute(<<-SQL, :fname => fname, :lname => lname)
       SELECT
         *
       FROM
         users
       WHERE
-        users.fname = :fname
-      SQL
-      User.new(result)
-  end
-
-  def self.find_by_lname(lname)
-    result = QuestionsDatabase.instance.execute(<<-SQL, :lname => lname)
-      SELECT
-        *
-      FROM
-        users
-      WHERE
-        users.lname = :lname
+        users.fname = :fname AND users.lname = :lname
       SQL
       User.new(result)
   end
@@ -50,12 +37,26 @@ class User
   attr_accessor :id, :fname, :lname
 
   def initialize(options)
+    p options
     @id = options["id"]
     @fname = options["fname"]
     @lname = options["lname"]
   end
 
+  def authored_questions
+    Question.find_by_user_id(@id)
+  end
+
+  def authored_replies
+    Reply.find_by_user_id(@id)
+  end
+
+  def followed_questions
+    QuestionFollower.followed_questions_for_user_id(@id)
+  end
 end
+
+
 
 
 

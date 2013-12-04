@@ -19,7 +19,7 @@ class QuestionLike
       WHERE
         question_likes.id = :id
       SQL
-      QuestionLike.new(result)
+      QuestionLike.new(result.first)
   end
 
   attr_accessor :id, :question_id, :user_id

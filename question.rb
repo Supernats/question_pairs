@@ -22,7 +22,20 @@ class Question
       WHERE
         questions.id = :id
       SQL
-      Question.new(result)
+    Question.new(result.first)
+  end
+
+  def self.find_by_user_id(user_id)
+    results = QuestionsDatabase.instance.execute(<<-SQL, :id => user_id)
+      SELECT
+        *
+      FROM
+        questions
+      WHERE
+        questions.user_id = :id
+    SQL
+
+    results.map { |result| Question.new(result) }
   end
 
   attr_accessor :id, :title, :body, :user_id
@@ -34,6 +47,15 @@ class Question
     @user_id = options["user_id"]
   end
 
-end
+  def author
+    User.find_by_id(@user_id)
+  end
 
-p Question.all
+  def replies
+    Reply.find_by_question_id(@id)
+  end
+
+  def followers
+    QuestionFollower.followers_for_question_id(@id)
+  end
+end
