@@ -81,6 +81,19 @@ class User
 
     result.first["average_karma"]
   end
+
+  def save
+    raise "already saved" unless self.id.nil?
+
+    QuestionsDatabase.instance.execute(<<-SQL, :fname => @fname, :lname => @lname)
+      INSERT INTO
+        users (fname, lname)
+      VALUES
+        (:fname, :lname)
+      SQL
+
+      @id = QuestionsDatabase.instance.last_insert_row_id
+  end
 end
 
 

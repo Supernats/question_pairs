@@ -1,7 +1,6 @@
 require_relative 'questions_database'
 
 class Question
-
   def self.all
     results = QuestionsDatabase.instance.execute(<<-SQL)
       SELECT
@@ -70,5 +69,18 @@ class Question
 
   def followers
     QuestionFollower.followers_for_question_id(@id)
+  end
+
+  def save
+    raise "already saved" unless self.id.nil?
+
+    QuestionsDatabase.instance.execute(<<-SQL, :title => @title, :body => body, :user_id => @user_id)
+      INSERT INTO
+        questions (title, body, user_id)
+      VALUES
+        (:title, :body, :user_id)
+      SQL
+
+      @id = QuestionsDatabase.instance.last_insert_row_id
   end
 end
