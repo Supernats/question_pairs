@@ -18,6 +18,8 @@ class Reply
         replies
       WHERE
         replies.id = :id
+      LIMIT
+        1
       SQL
       Reply.new(result.first)
   end

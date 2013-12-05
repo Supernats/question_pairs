@@ -18,6 +18,8 @@ class User
         users
       WHERE
         users.id = :id
+      LIMIT
+        1
       SQL
       User.new(result.first)
   end
@@ -30,6 +32,8 @@ class User
         users
       WHERE
         users.fname = :fname AND users.lname = :lname
+      LIMIT
+        1
       SQL
       User.new(result)
   end
@@ -53,6 +57,29 @@ class User
 
   def followed_questions
     QuestionFollower.followed_questions_for_user_id(@id)
+  end
+
+  def liked_questions
+    QuestionLike.liked_questions_for_user_id(@id)
+  end
+
+  def average_karma
+    result = QuestionsDatabase.instance.execute(<<-SQL, :user_id => @id)
+    SELECT
+      (COUNT(question_likes.id)*1.0)/(COUNT(questions.id)*1.0) AS average_karma
+    FROM
+      questions
+    LEFT JOIN
+      question_likes ON questions.id = question_likes.question_id
+    JOIN
+      users ON questions.user_id = users.id
+    WHERE
+      users.id = :user_id
+    LIMIT
+      1
+    SQL
+
+    result.first["average_karma"]
   end
 end
 

@@ -46,20 +46,26 @@ INSERT INTO
   users (fname, lname)
 VALUES
   ('Nathan','Seither'),
-  ('Nico', 'Lui');
+  ('Nico', 'Lui'),
+  ('Flarnie', 'Marchan');
 
 INSERT INTO
   questions (title, body, user_id)
 VALUES
   ('Who likes SQL?','Certainly not me!', '1'),
   ('What is with this indenting?', 'It sucks!', '2'),
-  ('Do you like cheese?', 'Yeaaaaa', '1');
+  ('Do you like cheese?', 'Yeaaaaa', '1'),
+  ('Who likes testing?', 'Because I do not', '3'),
+  ('Is this a question?', 'who cares', '1'),
+  ('Who is listening?','i am so alone', '1'),
+  ('WHYYYYY??!?','make it stop', '1');
 
 INSERT INTO
   question_followers (question_id, user_id)
 VALUES
   (1, 2),
-  (2, 1);
+  (2, 1),
+  (1, 1);
 
 INSERT INTO
   replies (question_id, parent_id, user_id, body)
@@ -72,5 +78,5 @@ INSERT INTO
   question_likes (user_id, question_id)
 VALUES
   (2,1),
-  (1,1),
-  (1,2);
+  (2,3),
+  (1,4);

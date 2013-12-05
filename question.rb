@@ -21,6 +21,8 @@ class Question
         questions
       WHERE
         questions.id = :id
+      LIMIT
+        1
       SQL
     Question.new(result.first)
   end
@@ -38,6 +40,9 @@ class Question
     results.map { |result| Question.new(result) }
   end
 
+  def self.most_liked(n)
+    QuestionLike.most_liked_questions(n)
+  end
   attr_accessor :id, :title, :body, :user_id
 
   def initialize(options)
@@ -49,6 +54,14 @@ class Question
 
   def author
     User.find_by_id(@user_id)
+  end
+
+  def likers
+    QuestionLike.likers_for_question_id(@id)
+  end
+
+  def num_likes
+    QuestionLike.num_likes_for_question_id(@id)
   end
 
   def replies

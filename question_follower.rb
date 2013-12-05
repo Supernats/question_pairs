@@ -27,17 +27,13 @@ class QuestionFollower
   def self.followers_for_question_id(question_id)
     results = QuestionsDatabase.instance.execute(<<-SQL, :id => question_id)
       SELECT
-        *
+        users.*
       FROM
         users
       JOIN
-        (SELECT
-          user_id
-        FROM
-          question_followers
-        WHERE
-          question_followers.question_id = :id) AS followers
-      ON users.id = followers.user_id
+        question_followers ON users.id = question_followers.user_id
+      WHERE
+        question_followers.question_id = :id
       SQL
 
     results.map { |result| User.new(result) }
@@ -46,23 +42,36 @@ class QuestionFollower
   def self.followed_questions_for_user_id(user_id)
     results = QuestionsDatabase.instance.execute(<<-SQL, :id => user_id)
       SELECT
-        *
+        questions.*
       FROM
         questions
       JOIN
-        (SELECT
-          question_id
-         FROM
-          question_followers
-         WHERE
-          question_followers.user_id = :id
-         ) AS questions_followed
-       ON questions.id = questions_followed.question_id
-    SQL
+        question_followers ON questions.id = question_followers.question_id
+      WHERE
+        question_followers.user_id = :id
+      SQL
 
     results.map { |result| Question.new(result) }
   end
 
+  def self.most_followed_questions(n)
+    results = QuestionsDatabase.instance.execute(<<-SQL, :n => n)
+      SELECT
+        questions.*
+      FROM
+        questions
+      JOIN
+        question_followers ON questions.id = question_followers.question_id
+      GROUP BY
+        questions.id
+      ORDER BY
+        COUNT(*) DESC
+      LIMIT
+        :n
+    SQL
+
+    results.map { |result| Question.new(result) }
+  end
   attr_accessor :id, :user_id, :question_id
 
   def initialize(options)
